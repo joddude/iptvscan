@@ -1,6 +1,8 @@
 # iptvscan
 # Script for scanning and saving IPTV playlist.
 # Python v.3 required for using. https://www.python.org/downloads/
+# This script can scan only multicast IPTV. https://en.wikipedia.org/wiki/Multicast_address
+# If first IP number less 224 - this script will not work.
 
 # Author: joddude <joddude@gmail.com>
 
