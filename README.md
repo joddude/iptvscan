@@ -1,5 +1,5 @@
 # iptvscan
-Python script for scanning and saving IPTV playlist.
+Python script for scanning multicast IPTV and saving playlist.
 
 ## How to use
 - First of all, make sure that the channels you want to scan are provided using [multicast](https://en.wikipedia.org/wiki/Multicast_address) IPTV technology.
