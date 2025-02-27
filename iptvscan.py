@@ -22,17 +22,14 @@
 
 #------------------------------------------------------------------------------
 
-# Ukrtelecom (udp://@232.0.2.10:3000)
 protocol = 'udp'
-ip_start = '232.0.2.0'
-ip_end =   '232.0.2.254'
-port = 3000
-
-# oll.tv (rtp://@233.12.130.250:2000)
-#protocol = 'rtp'
-#ip_start = '233.12.130.0'
-#ip_end =   '233.12.131.254'
-#port = 2000
+ip_start = '233.252.8.0'
+ip_end   = '233.252.8.254'
+ports    = [1234, 1235, 1238, 1239, 1250, 1251, 1252, 1281, 1282, 1283, 1284,
+            1292, 2101, 2104, 2178, 2191, 2192, 2193, 2194, 2201, 2208, 2223,
+            2224, 2225, 2226, 2345, 4120, 5140, 6000, 8004, 8012, 8024, 8028,
+            8124, 8138, 8224, 8302, 9000, 9008, 9012, 9020, 9024, 9040, 9044,
+            9048, 9052, 9068, 9072, 9076, 9132, 9136, 9148, 9208]
 
 timeout=1   # seconds
 random_search = False   # False or True
@@ -54,19 +51,20 @@ def main():
     playlist_name = 'IPTV-'+datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.m3u'
     found_channels = 0
     print('IP from', ip_start, 'to', ip_end, '('+str(len(ip_list))+')')
-    print('Port:', port)
+    print('Ports: ', *ports)
     print('Playlist name:', playlist_name)
     with open(playlist_name, "w") as file:
         print('#EXTM3U', file=file)
         print('', file=file)
-        update_progress(0, 'Scan '+ip_start)
+        update_progress(0, 'Scan '+ip_start+':'+str(ports[0]))
         for counter, ip in enumerate(ip_list, start=1):
-            if iptv_test(ip, port, timeout):
-                print('#EXTINF:-1,'+ip, file=file)
-                print(protocol+'://@'+ip+':'+str(port), file=file)
-                print('', file=file)
-                found_channels +=1
-            update_progress(counter/len(ip_list), 'Scan '+ip, '(Found '+str(found_channels)+' channels)    ')
+            for port in ports:
+                if iptv_test(ip, port, timeout):
+                    print('#EXTINF:-1,'+ip+':'+str(port), file=file)
+                    print(protocol+'://@'+ip+':'+str(port), file=file)
+                    print('', file=file)
+                    found_channels +=1
+                update_progress(counter/len(ip_list), 'Scan '+ip+':'+str(port), '(Found '+str(found_channels)+' channels)    ')
     print('Found '+str(found_channels)+' channels')
 
 #------------------------------------------------------------------------------
