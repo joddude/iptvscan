@@ -45,26 +45,25 @@ from random import shuffle
 #------------------------------------------------------------------------------
 
 def main():
-    ip_list = ip_range(ip_start, ip_end)
+    scan_list = generate_scan_list(ip_start, ip_end, ports)
     if random_search:
-        shuffle(ip_list)
+        random.shuffle(scan_list)
     playlist_name = 'IPTV-'+datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.m3u'
     found_channels = 0
-    print('IP from', ip_start, 'to', ip_end, '('+str(len(ip_list))+')')
+    print('IP from', ip_start, 'to', ip_end, '('+str(len(scan_list))+')')
     print('Ports: ', *ports)
     print('Playlist name:', playlist_name)
     with open(playlist_name, "w") as file:
         print('#EXTM3U', file=file)
         print('', file=file)
         update_progress(0, 'Scan '+ip_start+':'+str(ports[0]))
-        for counter, ip in enumerate(ip_list, start=1):
-            for port in ports:
-                if iptv_test(ip, port, timeout):
-                    print('#EXTINF:-1,'+ip+':'+str(port), file=file)
-                    print(protocol+'://@'+ip+':'+str(port), file=file)
-                    print('', file=file)
-                    found_channels +=1
-                update_progress(counter/len(ip_list), 'Scan '+ip+':'+str(port), '(Found '+str(found_channels)+' channels)    ')
+        for counter, scan_item in enumerate(scan_list, start=1):
+            if iptv_test(scan_item['ip'], scan_item['port'], timeout):
+                print('#EXTINF:-1,'+scan_item['ip']+':'+str(scan_item['port']), file=file)
+                print(protocol+'://@'+scan_item['ip']+':'+str(scan_item['port']), file=file)
+                print('', file=file)
+                found_channels +=1
+            update_progress(counter/len(scan_list), 'Scan '+scan_item['ip']+':'+str(scan_item['port']), '(Found '+str(found_channels)+' channels)    ')
     print('Found '+str(found_channels)+' channels')
 
 #------------------------------------------------------------------------------
@@ -86,12 +85,12 @@ def iptv_test(ip, port, timeout=1):
 
 #------------------------------------------------------------------------------
 
-def ip_range(start_ip, end_ip):
-    start = list(map(int, start_ip.split(".")))
-    end = list(map(int, end_ip.split(".")))
+def generate_scan_list(ip_start, ip_end, ports):
+    start = list(map(int, ip_start.split(".")))
+    end = list(map(int, ip_end.split(".")))
     temp = start
     ip_range = []
-    ip_range.append(start_ip)
+    ip_range.append(ip_start)
     while temp != end:
         start[3] += 1
         for i in (3, 2, 1):
@@ -99,7 +98,11 @@ def ip_range(start_ip, end_ip):
                 temp[i] = 0
                 temp[i-1] += 1
         ip_range.append(".".join(map(str, temp)))
-    return ip_range
+    scan_list = []
+    for ip in ip_range:
+        for port in ports:
+            scan_list.append({'ip': ip, 'port': port})
+    return scan_list
 
 #------------------------------------------------------------------------------
 
