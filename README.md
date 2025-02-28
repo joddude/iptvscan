@@ -11,6 +11,6 @@ If first number in IP adress less 224 - this not multicast IPTV.
 
 - Install python version 3 from https://www.python.org/downloads/
 
-- Open iptvscan.py in text editor and edit variables ip_start, ip_end and port.
+- Open iptvscan.py in text editor and edit variables ip_start, ip_end and list of ports.
 
 - Run iptvscan.py

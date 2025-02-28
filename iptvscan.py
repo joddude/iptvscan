@@ -9,7 +9,7 @@
 # - Next, you need to know at least one IP address and port with working IPTV. The script will allow you to scan other channels.
 # If first number in IP adress less 224 - this not multicast IPTV.
 # - Install python version 3 from https://www.python.org/downloads/
-# - Open iptvscan.py in text editor and edit variables ip_start, ip_end and port.
+# - Open iptvscan.py in text editor and edit variables ip_start, ip_end and list of ports.
 # - Run iptvscan.py
 
 # Author: joddude <joddude@gmail.com>
