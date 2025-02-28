@@ -22,7 +22,6 @@
 
 #------------------------------------------------------------------------------
 
-protocol = 'udp'
 ip_start = '233.252.8.0'
 ip_end   = '233.252.8.254'
 ports    = [1234, 1235, 1238, 1239, 1250, 1251, 1252, 1281, 1282, 1283, 1284,
@@ -31,7 +30,7 @@ ports    = [1234, 1235, 1238, 1239, 1250, 1251, 1252, 1281, 1282, 1283, 1284,
             8124, 8138, 8224, 8302, 9000, 9008, 9012, 9020, 9024, 9040, 9044,
             9048, 9052, 9068, 9072, 9076, 9132, 9136, 9148, 9208]
 
-timeout=1   # seconds
+timeout=1               # seconds
 random_search = False   # False or True
 
 #------------------------------------------------------------------------------
@@ -40,7 +39,11 @@ import socket
 import struct
 import os, sys
 import time, datetime
-from random import shuffle
+import random
+
+#------------------------------------------------------------------------------
+
+playlist_name = 'IPTV-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'.m3u'
 
 #------------------------------------------------------------------------------
 
@@ -48,23 +51,27 @@ def main():
     scan_list = generate_scan_list(ip_start, ip_end, ports)
     if random_search:
         random.shuffle(scan_list)
-    playlist_name = 'IPTV-'+datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.m3u'
+    print(f'IP from {ip_start} to {ip_end} ({len(scan_list)})\n')
+    print('Ports:', *ports, '\n')
+    print('Playlist name:', playlist_name, '\n')
+    with open(playlist_name, 'w') as f:
+        f.write('#EXTM3U\n')
     found_channels = 0
-    print('IP from', ip_start, 'to', ip_end, '('+str(len(scan_list))+')')
-    print('Ports: ', *ports)
-    print('Playlist name:', playlist_name)
-    with open(playlist_name, "w") as file:
-        print('#EXTM3U', file=file)
-        print('', file=file)
-        update_progress(0, 'Scan '+ip_start+':'+str(ports[0]))
-        for counter, scan_item in enumerate(scan_list, start=1):
-            if iptv_test(scan_item['ip'], scan_item['port'], timeout):
-                print('#EXTINF:-1,'+scan_item['ip']+':'+str(scan_item['port']), file=file)
-                print(protocol+'://@'+scan_item['ip']+':'+str(scan_item['port']), file=file)
-                print('', file=file)
-                found_channels +=1
-            update_progress(counter/len(scan_list), 'Scan '+scan_item['ip']+':'+str(scan_item['port']), '(Found '+str(found_channels)+' channels)    ')
-    print('Found '+str(found_channels)+' channels')
+    update_progress(0, 'Scan '+ip_start+':'+str(ports[0]))
+    for counter, scan_item in enumerate(scan_list, start=1):
+        if iptv_test(scan_item['ip'], scan_item['port'], timeout):
+            write_to_playlist(scan_item['ip'], str(scan_item['port']))
+            found_channels +=1
+        update_progress(counter/len(scan_list), 'Scan '+scan_item['ip']+':'+str(scan_item['port']), '(Found '+str(found_channels)+' channels)    ')
+    print(f'\nFound {found_channels} channels.')
+
+#------------------------------------------------------------------------------
+
+def write_to_playlist(ip, port):
+    with open(playlist_name, 'a') as f:
+        f.write(f'#EXTINF:-1,IPTV Channel {ip}:{port}\n')
+        f.write(f'udp://@{ip}:{port}\n')
+        f.write('\n')
 
 #------------------------------------------------------------------------------
 
@@ -73,7 +80,7 @@ def iptv_test(ip, port, timeout=1):
     sock.settimeout(timeout)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', port))
-    mreq = struct.pack("4sl", socket.inet_aton(ip), socket.INADDR_ANY)
+    mreq = struct.pack('4sl', socket.inet_aton(ip), socket.INADDR_ANY)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     try:
         if sock.recv(10240):
@@ -86,8 +93,8 @@ def iptv_test(ip, port, timeout=1):
 #------------------------------------------------------------------------------
 
 def generate_scan_list(ip_start, ip_end, ports):
-    start = list(map(int, ip_start.split(".")))
-    end = list(map(int, ip_end.split(".")))
+    start = list(map(int, ip_start.split('.')))
+    end = list(map(int, ip_end.split('.')))
     temp = start
     ip_range = []
     ip_range.append(ip_start)
@@ -97,7 +104,7 @@ def generate_scan_list(ip_start, ip_end, ports):
             if temp[i] == 256:
                 temp[i] = 0
                 temp[i-1] += 1
-        ip_range.append(".".join(map(str, temp)))
+        ip_range.append('.'.join(map(str, temp)))
     scan_list = []
     for ip in ip_range:
         for port in ports:
@@ -112,13 +119,13 @@ def update_progress(progress, title='Progress', status = ''):
         progress = float(progress)
     if not isinstance(progress, float):
         progress = 0
-        status = "error: progress var must be float\r\n"
+        status = 'error: progress var must be float\r\n'
     if progress < 0:
         progress = 0
-        status = "Halt"+" "*21+"\r\n"
+        status = 'Halt'+' '*21+'\r\n'
     if progress >= 1:
         progress = 1
-        status = "Done"+" "*21+"\r\n"
+        status = 'Done'+' '*21+'\r\n'
     block = int(round(barLength*progress))
     text = '\r'+title+': [{0}] {1}% {2}'.format( '#'*block + '-'*(barLength-block), round(progress*100), status)
     sys.stdout.write(text)
@@ -128,11 +135,10 @@ def update_progress(progress, title='Progress', status = ''):
 
 if __name__ == '__main__':
     try:
-        print('IPTV scan started. Press Ctrl+C to stop.')
+        print('IPTV scan started. Press Ctrl+C to stop.\n')
         main()
     except KeyboardInterrupt:
-        print()
-        print('You pressed Ctrl+C. Stop')
+        print('\n\nYou pressed Ctrl+C. Stop')
         sys.exit()
     except:
         import sys
