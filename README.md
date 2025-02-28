@@ -1,6 +1,8 @@
 # iptvscan
 Python script for scanning multicast IPTV and saving playlist.
 
+The multi-threaded version scans faster, but it is not well-tested.
+
 ## How to use
 - First of all, make sure that the channels you want to scan are provided using [multicast](https://en.wikipedia.org/wiki/Multicast_address) IPTV technology.
 Even if someone calls it IPTV, it doesn't mean it is. If you don't know what technology is used, then it's most likely not multicast IPTV.
@@ -14,3 +16,8 @@ If first number in IP adress less 224 - this not multicast IPTV.
 - Open iptvscan.py in text editor and edit variables ip_start, ip_end and list of ports.
 
 - Run iptvscan.py
+
+## Thank you for using
+If you like this script
+
+<a href="https://www.buymeacoffee.com/joddude" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
