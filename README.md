@@ -18,6 +18,6 @@ If first number in IP adress less 224 - this not multicast IPTV.
 - Run iptvscan.py
 
 ## Thank you for using
-If you like this script
+If you like this script, please consider donating. 
 
-<a href="https://www.buymeacoffee.com/joddude" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+https://donatello.to/joddude
