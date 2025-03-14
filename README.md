@@ -20,4 +20,4 @@ If first number in IP adress less 224 - this not multicast IPTV.
 ## Thank you for using
 If you like this script, please consider donating. 
 
-https://donatello.to/joddude
+https://ko-fi.com/joddude
